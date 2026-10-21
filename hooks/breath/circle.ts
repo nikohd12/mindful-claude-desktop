@@ -14,10 +14,6 @@ const CY = 66
 const R_MIN = 10
 const R_MAX = 44
 
-// cubic-bezier forms of the terminal's quadratic ease-out, and of a straight hold
-const SPLINE = { ease: '0.333 0.667 0.667 1', linear: '0 0 1 1' } as const
-type Spline = keyof typeof SPLINE
-
 export type Segment = { text: string; startMs: number; endMs: number }
 
 /** The countdown lines across one cycle, each with the stretch of time it shows. */
@@ -37,28 +33,22 @@ export function labelSegments(ex: Exercise): Segment[] {
   return segs
 }
 
-/** How full the circle is (0..1) at each phase boundary, as fractions of one cycle. */
-export function radiusKeys(ex: Exercise): { keyTimes: number[]; values: number[]; splines: Spline[] } {
+/** How full the circle is (0..1) at each phase boundary, as fractions of one cycle. Between
+ * boundaries it moves evenly, so each second of the countdown grows or shrinks it by one step. */
+export function radiusKeys(ex: Exercise): { keyTimes: number[]; values: number[] } {
   const cycle = cycleMs(ex)
   const firstFull = ex.sip ? 0.85 : 1
-  const phases: [number, number, Spline][] = [
-    [ex.inhaleMs, firstFull, 'ease'],
-    [ex.hold1Ms, 1, ex.sip ? 'ease' : 'linear'],
-    [ex.exhaleMs, 0, 'ease'],
-    [ex.hold2Ms, 0, 'linear'],
-  ]
+  const phases: [number, number][] = [[ex.inhaleMs, firstFull], [ex.hold1Ms, 1], [ex.exhaleMs, 0], [ex.hold2Ms, 0]]
   const keyTimes = [0]
   const values = [0]
-  const splines: Spline[] = []
   let at = 0
-  for (const [ms, value, spline] of phases) {
+  for (const [ms, value] of phases) {
     if (ms <= 0) continue
     at += ms
     keyTimes.push(round(at / cycle))
     values.push(value)
-    splines.push(spline)
   }
-  return { keyTimes, values, splines }
+  return { keyTimes, values }
 }
 
 /** The band's picture, `breathMs` into the breath: every redraw restarts an image's animation,
@@ -70,10 +60,10 @@ export function circleSvg(ex: Exercise, breathMs: number): string {
   const dur = `${round(cycle / 1000)}s`
   const loop = `dur="${dur}" begin="${begin}" repeatCount="indefinite"`
 
-  const { keyTimes, values, splines } = radiusKeys(ex)
+  const { keyTimes, values } = radiusKeys(ex)
   const radius = (grow: number) =>
     `<animate attributeName="r" values="${values.map(v => round(R_MIN + grow + (R_MAX - R_MIN) * v)).join(';')}" ` +
-    `keyTimes="${keyTimes.join(';')}" calcMode="spline" keySplines="${splines.map(s => SPLINE[s]).join(';')}" ${loop}/>`
+    `keyTimes="${keyTimes.join(';')}" calcMode="linear" ${loop}/>`
 
   const lines = labelSegments(ex).map(s => {
     const from = round(s.startMs / cycle)
