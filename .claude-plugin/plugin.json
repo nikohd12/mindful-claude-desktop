@@ -1,0 +1,18 @@
+{
+  "name": "mindful-desktop",
+  "version": "0.1.0",
+  "description": "Desktop app version of Mindful Claude: guided breathing above the prompt while Claude works, drawn as a smooth circle in the Claude desktop app's Code tab (and Mindful Claude's band in the terminal). /breathe on, off, hrv, sigh, box, 478.",
+  "license": "MIT",
+  "keywords": [
+    "breathing",
+    "mindfulness",
+    "desktop",
+    "function-hooks",
+    "mod"
+  ],
+  "author": {
+    "name": "nikohd12"
+  },
+  "homepage": "https://github.com/nikohd12/mindful-claude-desktop",
+  "repository": "https://github.com/nikohd12/mindful-claude-desktop"
+}

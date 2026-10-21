@@ -1,0 +1,13 @@
+{
+  "name": "mindful-claude-desktop",
+  "owner": {
+    "name": "nikohd12"
+  },
+  "plugins": [
+    {
+      "name": "mindful-desktop",
+      "source": "./",
+      "description": "Desktop app version of Mindful Claude: guided breathing above the prompt while Claude works, drawn as a smooth circle in the Claude desktop app's Code tab (and Mindful Claude's band in the terminal). /breathe on, off, hrv, sigh, box, 478."
+    }
+  ]
+}
